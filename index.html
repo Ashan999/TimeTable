@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Sujani Pharma Plan</title>
+<title>Future Pharmasys Time Table</title>
 
 <!-- PWA Meta Tags -->
 <meta name="application-name" content="Pharmasys">
@@ -758,11 +758,14 @@ function getOrCreateTasks(dateKey, dayOfWeek){
 function updateClock(){
   const now = new Date();
   const h = pad(now.getHours()), m = pad(now.getMinutes()), s = pad(now.getSeconds());
-  document.getElementById('liveTime').textContent = `${h}:${m}`;
+  document.getElementById('liveTime').textContent = h + ':' + m;
   const dayName = DAYS[now.getDay()];
-  const opts = {weekday:'long',year:'numeric',month:'short',day:'numeric'};
-  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', opts);
-  document.getElementById('headerDayLabel').textContent = `${dayName} – ${h}:${m}:${s}`;
+  // Safari-safe date formatting (avoid toLocaleDateString with locale on older iOS)
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const dateStr = dayNames[now.getDay()] + ', ' + monthNames[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+  document.getElementById('liveDate').textContent = dateStr;
+  document.getElementById('headerDayLabel').textContent = dayName + ' – ' + h + ':' + m + ':' + s;
 }
 
 function getCurrentSlot(){
@@ -820,7 +823,7 @@ function updateHome(){
     const slot = getCurrentSlot();
     if(slot){
       document.getElementById('nowTask').textContent = slot[4];
-      document.getElementById('nowTimeRange').textContent = `${fmtTime(slot[0],slot[1])} – ${fmtTime(slot[2],slot[3])}`;
+      document.getElementById('nowTimeRange').textContent = fmtTime(slot[0],slot[1]) + ' – ' + fmtTime(slot[2],slot[3]);
       document.getElementById('nowEmoji').textContent = TYPE_EMOJI[slot[5]]||'📚';
     } else {
       document.getElementById('nowTask').textContent = 'No scheduled task right now';
@@ -888,7 +891,11 @@ function updateHome(){
 // NOTIFICATIONS
 // ============================================================
 function requestNotifPermission(){
-  if(!('Notification' in window)){ showToast('Notifications not supported in this browser'); return; }
+  if(!NOTIF_SUPPORTED){
+    showToast('Notifications not supported on this browser/device');
+    document.getElementById('notifBanner').classList.add('hidden');
+    return;
+  }
   Notification.requestPermission().then(perm=>{
     if(perm==='granted'){
       document.getElementById('notifBanner').classList.add('hidden');
@@ -1126,14 +1133,21 @@ function showToast(msg){
 }
 
 // ============================================================
+// BROWSER DETECTION
+// ============================================================
+const IS_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const NOTIF_SUPPORTED = ('Notification' in window) && !IS_IOS;
+
+// ============================================================
 // INIT
 // ============================================================
 function init(){
   const now = new Date();
   viewedTTDay = now.getDay();
 
-  // Notification banner
-  if(Notification.permission==='granted' || !('Notification' in window)){
+  // Hide notification banner on iOS (not supported) or already granted
+  if(!NOTIF_SUPPORTED || Notification.permission==='granted'){
     document.getElementById('notifBanner').classList.add('hidden');
   }
 
