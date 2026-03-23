@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Future Pharmasys Time Table</title>
+
+<!-- PWA Meta Tags -->
+<meta name="application-name" content="Pharmasys">
+<meta name="description" content="Smart pharmacy study timetable assistant">
+<meta name="theme-color" content="#e91e8c">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- iOS PWA Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pharmasys">
+
+<!-- PWA Manifest (inline via blob — works for local HTML files) -->
+<script>
+(function(){
+  const manifest = {
+    name: "Future Pharmasys Time Table",
+    short_name: "Pharmasys",
+    description: "Smart pharmacy study timetable & task assistant",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#fff0f6",
+    theme_color: "#e91e8c",
+    orientation: "portrait",
+    icons: [
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23e91e8c'/><text y='140' x='96' text-anchor='middle' font-size='120'>💊</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23e91e8c'/><text y='380' x='256' text-anchor='middle' font-size='320'>💊</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = url;
+  document.currentScript.after(link);
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink-100: #fff0f6;
+    --pink-200: #ffd6e7;
+    --pink-300: #ffb3ce;
+    --pink-400: #ff85b3;
+    --pink-500: #f06292;
+    --pink-600: #e91e8c;
+    --rose: #ff4d8d;
+    --peach: #ffb997;
+    --lavender: #e8d5f5;
+    --mint: #d0f0e8;
+    --gold: #f6c90e;
+    --text-dark: #2d1b2e;
+    --text-mid: #5a3f5c;
+    --text-light: #9a7d9c;
+    --white: #ffffff;
+    --card-bg: rgba(255,255,255,0.88);
+    --shadow-sm: 0 2px 12px rgba(240,98,146,0.10);
+    --shadow-md: 0 8px 32px rgba(240,98,146,0.18);
+    --shadow-lg: 0 16px 48px rgba(240,98,146,0.22);
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #fff0f6 0%, #fde8f0 40%, #fce4ec 70%, #f8e4ff 100%);
+    min-height: 100vh;
+    color: var(--text-dark);
+    overflow-x: hidden;
+  }
+
+  /* Decorative blobs */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -120px; right: -80px;
+    width: 340px; height: 340px;
+    background: radial-gradient(circle, #ffb3ce55 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -100px; left: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, #e8d5f555 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== APP SHELL ===== */
+  #app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding-bottom: 90px; }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(135deg, #f06292, #e91e8c 60%, #c2185b);
+    padding: 20px 20px 28px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 24px rgba(233,30,140,0.25);
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .app-title { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.15rem; font-weight: 700; line-height: 1.2; }
+  .app-subtitle { color: rgba(255,255,255,0.75); font-size: 0.72rem; font-weight: 400; letter-spacing: 0.04em; }
+  .live-time { color: #fff; font-size: 1.6rem; font-weight: 600; letter-spacing: 0.04em; }
+  .live-date { color: rgba(255,255,255,0.8); font-size: 0.75rem; text-align: right; margin-top: 2px; }
+  .header-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.2); border-radius: 20px;
+    padding: 4px 10px; font-size: 0.7rem; color: #fff; margin-top: 8px;
+  }
+  .pill-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; animation: blink 1.4s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ===== NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid #ffd6e7;
+    display: flex; z-index: 200;
+    box-shadow: 0 -4px 20px rgba(240,98,146,0.12);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 10px 0; background: none; border: none; cursor: pointer;
+    font-size: 0.62rem; color: var(--text-light); font-family: 'DM Sans', sans-serif;
+    transition: color 0.2s;
+    gap: 3px;
+  }
+  .nav-btn .nav-icon { font-size: 1.3rem; }
+  .nav-btn.active { color: var(--pink-600); }
+  .nav-btn.active .nav-icon { filter: drop-shadow(0 0 6px #f06292aa); }
+
+  /* ===== SECTIONS ===== */
+  .section { display: none; padding: 20px 16px 8px; animation: fadeIn 0.35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,182,193,0.3);
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.0rem; color: var(--text-dark);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ===== HOME SECTION ===== */
+  .now-card {
+    background: linear-gradient(135deg, #fff0f6, #fde4ec);
+    border: 2px solid var(--pink-300);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    margin-bottom: 14px;
+    position: relative; overflow: hidden;
+    animation: pulseGlow 3s infinite;
+  }
+  @keyframes pulseGlow {
+    0%,100% { box-shadow: 0 4px 20px rgba(240,98,146,0.15); }
+    50% { box-shadow: 0 4px 32px rgba(240,98,146,0.38); }
+  }
+  .now-label { font-size: 0.72rem; color: var(--pink-600); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .now-task { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: var(--text-dark); line-height: 1.35; margin: 6px 0 4px; }
+  .now-time-range { font-size: 0.8rem; color: var(--text-mid); font-weight: 500; }
+  .now-emoji { position: absolute; right: 18px; top: 18px; font-size: 2.2rem; opacity: 0.85; }
+
+  .countdown-card {
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .countdown-card.show { display: block; }
+  .countdown-label { font-size: 0.7rem; color: var(--pink-600); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .countdown-timer { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); letter-spacing: 0.06em; font-variant-numeric: tabular-nums; }
+  .countdown-desc { font-size: 0.78rem; color: var(--text-mid); margin-top: 2px; }
+
+  .motivate-banner {
+    background: linear-gradient(135deg, var(--lavender), #f3e5f5);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #6a1b9a;
+    font-style: italic;
+    margin-bottom: 14px;
+    border: 1px solid #e1bee7;
+  }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 14px; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-label { font-size: 0.8rem; color: var(--text-mid); font-weight: 500; }
+  .progress-pct { font-size: 0.8rem; color: var(--pink-600); font-weight: 600; }
+  .progress-bar-bg {
+    height: 10px; background: var(--pink-200); border-radius: 20px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #f06292, #e91e8c);
+    border-radius: 20px; transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ===== TIMETABLE SECTION ===== */
+  .day-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .day-nav-btn {
+    background: var(--pink-200); border: none; border-radius: 50%;
+    width: 36px; height: 36px; font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--pink-600); transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .day-nav-btn:hover { background: var(--pink-300); }
+  .day-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem; color: var(--text-dark); font-weight: 700;
+    text-align: center; flex: 1;
+  }
+  .day-date-sub { font-size: 0.7rem; color: var(--text-light); text-align: center; }
+
+  .slot-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 13px 15px;
+    margin-bottom: 10px;
+    display: flex; align-items: flex-start; gap: 12px;
+    border-left: 4px solid var(--pink-300);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .slot-card:hover { transform: translateX(3px); box-shadow: var(--shadow-md); }
+  .slot-card.active-slot { border-left-color: var(--rose); background: #fff5f8; }
+  .slot-card.class-slot { border-left-color: #9c27b0; }
+  .slot-time { font-size: 0.7rem; color: var(--text-light); font-weight: 500; white-space: nowrap; min-width: 60px; padding-top: 2px; }
+  .slot-name { font-size: 0.88rem; color: var(--text-dark); font-weight: 500; line-height: 1.3; }
+  .slot-badge {
+    display: inline-block; font-size: 0.6rem; padding: 2px 7px;
+    border-radius: 20px; font-weight: 600; margin-top: 4px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .badge-class { background: #e1bee7; color: #6a1b9a; }
+  .badge-break { background: var(--mint); color: #1b5e20; }
+  .badge-study { background: var(--pink-200); color: var(--pink-600); }
+  .badge-active { background: linear-gradient(90deg, #f06292, #e91e8c); color: #fff; animation: badgePulse 2s infinite; }
+  @keyframes badgePulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+  .sunday-card {
+    background: linear-gradient(135deg, #fff8e1, #fff3e0);
+    border-radius: var(--radius);
+    padding: 36px 20px;
+    text-align: center;
+    border: 2px dashed #ffcc02;
+    display: none;
+  }
+  .sunday-card.show { display: block; }
+  .sunday-emoji { font-size: 3rem; margin-bottom: 10px; }
+  .sunday-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #e65100; margin-bottom: 6px; }
+  .sunday-sub { font-size: 0.82rem; color: #bf360c; }
+
+  /* ===== TODO SECTION ===== */
+  .todo-item {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 15px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255,182,193,0.25);
+    transition: opacity 0.3s, background 0.2s;
+  }
+  .todo-item.done { opacity: 0.55; background: #f8f8f8; }
+  .todo-check {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--pink-400); background: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.2s, border-color 0.2s;
+    font-size: 0.75rem;
+  }
+  .todo-item.done .todo-check { background: var(--pink-500); border-color: var(--pink-500); color: #fff; }
+  .todo-text { font-size: 0.87rem; color: var(--text-dark); flex: 1; line-height: 1.35; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-light); }
+  .todo-time { font-size: 0.68rem; color: var(--text-light); white-space: nowrap; }
+
+  .submit-day-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #f06292, #e91e8c);
+    color: #fff; border: none; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; margin-top: 6px;
+    box-shadow: 0 4px 18px rgba(233,30,140,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .submit-day-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(233,30,140,0.4); }
+  .submit-day-btn:active { transform: translateY(0); }
+
+  /* ===== HISTORY SECTION ===== */
+  .hist-day {
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255,182,193,0.2);
+  }
+  .hist-day-title { font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+  .hist-stat { font-size: 0.78rem; color: var(--text-mid); }
+  .hist-bar-bg { height: 6px; background: var(--pink-200); border-radius: 20px; margin-top: 8px; overflow: hidden; }
+  .hist-bar-fill { height: 100%; background: linear-gradient(90deg, #f06292, #e91e8c); border-radius: 20px; transition: width 0.6s; }
+
+  /* ===== POPUP OVERLAY ===== */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(45,27,46,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 500; display: none;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .popup {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    max-width: 360px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    animation: popIn 0.35s cubic-bezier(.34,1.56,.64,1);
+    text-align: center;
+  }
+  @keyframes popIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
+  .popup-emoji { font-size: 3rem; margin-bottom: 10px; }
+  .popup-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--text-dark); margin-bottom: 8px; }
+  .popup-sub { font-size: 0.82rem; color: var(--text-mid); margin-bottom: 20px; line-height: 1.5; }
+  .popup-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #f06292, #e91e8c);
+    color: #fff; border: none; border-radius: 30px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; margin: 4px;
+    box-shadow: 0 4px 14px rgba(233,30,140,0.3);
+    transition: transform 0.15s;
+  }
+  .popup-btn:hover { transform: translateY(-2px); }
+  .popup-btn.outline {
+    background: none; color: var(--pink-600);
+    border: 2px solid var(--pink-300);
+    box-shadow: none;
+  }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--text-dark); color: #fff;
+    padding: 10px 20px; border-radius: 30px;
+    font-size: 0.8rem; z-index: 600;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s; white-space: nowrap;
+    max-width: 90vw;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Section headers */
+  .section-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: var(--text-dark);
+    margin-bottom: 16px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* Chips row for day selector */
+  .day-chips { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; scrollbar-width: none; }
+  .day-chips::-webkit-scrollbar { display: none; }
+  .day-chip {
+    padding: 6px 14px; border-radius: 20px; font-size: 0.72rem; font-weight: 600;
+    background: var(--pink-100); color: var(--text-mid); border: 1.5px solid var(--pink-200);
+    cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .day-chip.active { background: linear-gradient(135deg, #f06292, #e91e8c); color: #fff; border-color: transparent; box-shadow: 0 2px 10px rgba(233,30,140,0.25); }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-light); font-size: 0.88rem; }
+  .empty-state .big-emoji { font-size: 3rem; margin-bottom: 10px; }
+
+  /* Notification permission banner */
+  .notif-banner {
+    background: linear-gradient(135deg, #fff8e1, #fff3e0);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid #ffe082;
+    cursor: pointer;
+  }
+  .notif-banner.hidden { display: none; }
+  .notif-banner-text { font-size: 0.78rem; color: #e65100; flex: 1; line-height: 1.4; }
+  .notif-banner-btn { font-size: 0.72rem; background: #ff6f00; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; white-space: nowrap; }
+
+  @media (max-width: 360px) {
+    .app-title { font-size: 1rem; }
+    .live-time { font-size: 1.4rem; }
+    .now-task { font-size: 1.1rem; }
+  }
+
+  /* ===== INSTALL BANNER ===== */
+  #installBanner {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(120px);
+    width: calc(100% - 24px); max-width: 456px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(233,30,140,0.25), 0 2px 12px rgba(0,0,0,0.08);
+    border: 1.5px solid var(--pink-200);
+    padding: 16px 16px 16px 18px;
+    display: flex; align-items: center; gap: 14px;
+    z-index: 1000;
+    opacity: 0;
+    transition: transform 0.45s cubic-bezier(.34,1.4,.64,1), opacity 0.35s ease;
+    pointer-events: none;
+  }
+  #installBanner.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: all; }
+  .install-icon { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg,#f06292,#e91e8c); display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0; box-shadow:0 4px 12px rgba(233,30,140,0.3); }
+  .install-text { flex: 1; }
+  .install-title { font-weight:700; font-size:0.88rem; color:var(--text-dark); margin-bottom:2px; }
+  .install-sub { font-size:0.72rem; color:var(--text-light); line-height:1.4; }
+  .install-actions { display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+  .install-btn { padding:8px 14px; border-radius:30px; background:linear-gradient(135deg,#f06292,#e91e8c); color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:700; cursor:pointer; white-space:nowrap; box-shadow:0 2px 8px rgba(233,30,140,0.3); transition:transform 0.15s; }
+  .install-btn:hover { transform:scale(1.05); }
+  .install-dismiss { padding:6px 10px; border-radius:30px; background:none; color:var(--text-light); border:1px solid var(--pink-200); font-family:'DM Sans',sans-serif; font-size:0.72rem; cursor:pointer; text-align:center; }
+
+  /* iOS banner */
+  #iosBanner {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(140px);
+    width: calc(100% - 24px); max-width: 456px;
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(233,30,140,0.2);
+    border: 1.5px solid var(--pink-200);
+    padding: 18px 18px 14px;
+    z-index: 1000; opacity: 0;
+    transition: transform 0.45s cubic-bezier(.34,1.4,.64,1), opacity 0.35s ease;
+    pointer-events: none;
+  }
+  #iosBanner.visible { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: all; }
+  #iosBanner::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); border-left:10px solid transparent; border-right:10px solid transparent; border-top:10px solid #fff; filter:drop-shadow(0 3px 4px rgba(233,30,140,0.1)); }
+  .ios-banner-title { font-weight:700; font-size:0.9rem; color:var(--text-dark); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .ios-steps { list-style:none; padding:0; }
+  .ios-steps li { font-size:0.78rem; color:var(--text-mid); padding:6px 0; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--pink-100); line-height:1.4; }
+  .ios-steps li:last-child { border-bottom:none; }
+  .ios-step-num { width:20px; height:20px; border-radius:50%; background:var(--pink-200); color:var(--pink-600); font-weight:700; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ios-dismiss { margin-top:12px; width:100%; padding:9px; border-radius:12px; background:var(--pink-100); border:none; color:var(--pink-600); font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="header-top">
+      <div>
+        <div class="app-title">💊 Future Pharmasys</div>
+        <div class="app-subtitle">Smart Study Assistant</div>
+      </div>
+      <div style="text-align:right">
+        <div class="live-time" id="liveTime">--:--</div>
+        <div class="live-date" id="liveDate">Loading...</div>
+      </div>
+    </div>
+    <div class="header-pill">
+      <span class="pill-dot"></span>
+      <span id="headerDayLabel">Today</span>
+    </div>
+  </div>
+
+  <!-- HOME SECTION -->
+  <div class="section active" id="sec-home">
+    <!-- Notification banner -->
+    <div class="notif-banner" id="notifBanner">
+      <span style="font-size:1.4rem">🔔</span>
+      <div class="notif-banner-text">Enable notifications to get reminders before each task!</div>
+      <button class="notif-banner-btn" onclick="requestNotifPermission()">Enable</button>
+    </div>
+
+    <!-- NOW CARD -->
+    <div class="now-card" id="nowCard">
+      <div class="now-label">👉 What you should do now:</div>
+      <div class="now-task" id="nowTask">Loading...</div>
+      <div class="now-time-range" id="nowTimeRange">--:-- – --:--</div>
+      <div class="now-emoji" id="nowEmoji">📚</div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="countdown-card" id="countdownCard">
+      <div class="countdown-label" id="countdownLabel">⏱ Next class in</div>
+      <div class="countdown-timer" id="countdownTimer">00:00:00</div>
+      <div class="countdown-desc" id="countdownDesc"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="card">
+      <div class="progress-wrap">
+        <div class="progress-header">
+          <span class="progress-label">Today's Progress</span>
+          <span class="progress-pct" id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+      <div style="font-size:0.78rem; color:var(--text-light)" id="progressSub">0 of 0 tasks completed</div>
+    </div>
+
+    <!-- MOTIVATIONAL -->
+    <div class="motivate-banner">
+      ✨ Stay consistent, future pharmacist 💊<br>
+      <span style="font-size:0.75rem; opacity:0.8">Every hour of study is one step closer to your dream!</span>
+    </div>
+
+    <!-- NEXT TASK PREVIEW -->
+    <div class="card">
+      <div class="card-title">🔜 Coming Up Next</div>
+      <div id="nextTaskPreview" style="font-size:0.85rem; color:var(--text-mid)">—</div>
+    </div>
+  </div>
+
+  <!-- TIMETABLE SECTION -->
+  <div class="section" id="sec-timetable">
+    <div class="section-header">📅 Weekly Schedule</div>
+    <div class="day-chips" id="dayChips"></div>
+    <div class="day-nav">
+      <button class="day-nav-btn" onclick="changeDay(-1)">◀</button>
+      <div>
+        <div class="day-name" id="ttDayName">Monday</div>
+        <div class="day-date-sub" id="ttDayDate"></div>
+      </div>
+      <button class="day-nav-btn" onclick="changeDay(1)">▶</button>
+    </div>
+    <div class="sunday-card" id="sundayCard">
+      <div class="sunday-emoji">🌞</div>
+      <div class="sunday-title">Free Day – Rest & Recharge</div>
+      <div class="sunday-sub">Sunday is yours. Breathe, relax, and come back stronger 💪</div>
+    </div>
+    <div id="ttSlots"></div>
+  </div>
+
+  <!-- TODO SECTION -->
+  <div class="section" id="sec-todo">
+    <div class="section-header">✅ Today's Tasks</div>
+    <div class="card" style="padding:14px 16px; margin-bottom:14px;">
+      <div style="font-size:0.8rem; color:var(--text-mid)">
+        <span id="todoDateLabel" style="font-weight:600; color:var(--text-dark)"></span>
+        <span id="todoNavInfo" style="margin-left:6px; font-size:0.72rem; color:var(--text-light)"></span>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button onclick="todoNavDay(-1)" style="flex:1; padding:7px; background:var(--pink-100); border:1px solid var(--pink-200); border-radius:10px; font-size:0.75rem; cursor:pointer; font-family:'DM Sans',sans-serif; color:var(--pink-600);">◀ Yesterday</button>
+        <button onclick="todoNavDay(0)" style="flex:1; padding:7px; background:linear-gradient(135deg,#f06292,#e91e8c); border:none; border-radius:10px; font-size:0.75rem; cursor:pointer; font-family:'DM Sans',sans-serif; color:#fff; font-weight:600;">Today</button>
+        <button onclick="todoNavDay(1)" style="flex:1; padding:7px; background:var(--pink-100); border:1px solid var(--pink-200); border-radius:10px; font-size:0.75rem; cursor:pointer; font-family:'DM Sans',sans-serif; color:var(--pink-600);">Tomorrow ▶</button>
+      </div>
+    </div>
+    <div id="todoList"></div>
+    <button class="submit-day-btn" onclick="submitDay()">📋 Submit Today's Tasks</button>
+  </div>
+
+  <!-- HISTORY SECTION -->
+  <div class="section" id="sec-history">
+    <div class="section-header">📊 Task History</div>
+    <div id="histList"></div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchSection('home',this)">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-btn" onclick="switchSection('timetable',this)">
+    <span class="nav-icon">📅</span>Schedule
+  </button>
+  <button class="nav-btn" onclick="switchSection('todo',this)">
+    <span class="nav-icon">✅</span>Tasks
+  </button>
+  <button class="nav-btn" onclick="switchSection('history',this)">
+    <span class="nav-icon">📊</span>History
+  </button>
+</nav>
+
+<!-- OVERLAYS -->
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <div class="popup-emoji" id="popupEmoji">🎉</div>
+    <div class="popup-title" id="popupTitle">Great Work!</div>
+    <div class="popup-sub" id="popupSub">You've completed your tasks for today.</div>
+    <button class="popup-btn" onclick="closePopup()">✅ Done</button>
+    <button class="popup-btn outline" onclick="closePopup()">Maybe Later</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// TIMETABLE DATA
+// ============================================================
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// Each slot: [startH, startM, endH, endM, label, type]
+// type: 'study','break','class','revision','paper'
+const SCHEDULE = {
+  1: [ // Monday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Pharmacy Theory Study','study'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'English Study','study'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,22,0,'English Class (7–10 PM)','class'],
+  ],
+  2: [ // Tuesday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Pharmacy Theory Study','study'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'Past Paper Practice','paper'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,20,0,'Pharmacy Self Study','study'],
+    [20,0,23,0,'Pharmacy Revision (8–11 PM)','revision'],
+  ],
+  3: [ // Wednesday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Pharmacy Theory Study','study'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'English Study','study'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,21,0,'Zoom Class (7–9 PM)','class'],
+    [21,0,23,0,'Study / Review','study'],
+  ],
+  4: [ // Thursday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Pharmacy Theory Study','study'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'Model Paper Practice','paper'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,20,0,'Pharmacy Self Study','study'],
+    [20,0,22,0,'English Class (8–10 PM)','class'],
+  ],
+  5: [ // Friday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Pharmacy Theory Study','study'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'English Study','study'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,20,0,'Pharmacy Self Study','study'],
+    [20,0,22,0,'English Class (8–10 PM)','class'],
+  ],
+  6: [ // Saturday
+    [7,0,9,0,'Pharmacy Short Notes','study'],
+    [9,0,12,0,'Past / Model Papers','paper'],
+    [12,0,14,0,'Lunch & Cooking Break','break'],
+    [14,0,16,30,'Past / Model Papers','paper'],
+    [16,30,18,30,'Pharmacy Revision','revision'],
+    [18,30,19,0,'Tea Break & Relax','break'],
+    [19,0,20,0,'Pharmacy Short Notes','study'],
+    [20,0,23,0,'Study / Review','study'],
+  ],
+  0: null // Sunday – free
+};
+
+const TYPE_EMOJI = {
+  study: '📚', break: '🍵', class: '💻', revision: '📝', paper: '📄'
+};
+const TYPE_BADGE = {
+  study: 'study', break: 'break', class: 'class', revision: 'study', paper: 'study'
+};
+const TYPE_LABEL = {
+  study: 'Study', break: 'Break', class: '🎓 Class', revision: 'Revision', paper: 'Practice'
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let viewedTTDay = null; // 0-6
+let viewedTodoOffset = 0; // 0=today,-1=yesterday,+1=tomorrow
+let notifInterval = null;
+let lastNotifSlotKey = '';
+
+// ============================================================
+// UTILS
+// ============================================================
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtTime(h,m){ return `${pad(h)}:${pad(m)}`; }
+function toMinutes(h,m){ return h*60+m; }
+function todayKey(offset=0){
+  const d = new Date(); d.setDate(d.getDate()+offset);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+function dateForOffset(offset){
+  const d = new Date(); d.setDate(d.getDate()+offset);
+  return d;
+}
+function dayOfOffset(offset){
+  return dateForOffset(offset).getDay(); // 0=Sun
+}
+
+// ============================================================
+// LOCAL STORAGE
+// ============================================================
+function loadTasks(dateKey){
+  const raw = localStorage.getItem('tasks_'+dateKey);
+  return raw ? JSON.parse(raw) : null;
+}
+function saveTasks(dateKey, tasks){
+  localStorage.setItem('tasks_'+dateKey, JSON.stringify(tasks));
+}
+function generateTasks(dayOfWeek){
+  if(!SCHEDULE[dayOfWeek]) return [];
+  return SCHEDULE[dayOfWeek].map((s,i)=>({
+    id: i,
+    label: s[4],
+    type: s[5],
+    start: fmtTime(s[0],s[1]),
+    end: fmtTime(s[2],s[3]),
+    done: false
+  }));
+}
+function getOrCreateTasks(dateKey, dayOfWeek){
+  let tasks = loadTasks(dateKey);
+  if(!tasks){
+    tasks = generateTasks(dayOfWeek);
+    saveTasks(dateKey, tasks);
+  }
+  return tasks;
+}
+
+// ============================================================
+// CLOCK & HOME
+// ============================================================
+function updateClock(){
+  const now = new Date();
+  const h = pad(now.getHours()), m = pad(now.getMinutes()), s = pad(now.getSeconds());
+  document.getElementById('liveTime').textContent = `${h}:${m}`;
+  const dayName = DAYS[now.getDay()];
+  const opts = {weekday:'long',year:'numeric',month:'short',day:'numeric'};
+  document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('headerDayLabel').textContent = `${dayName} – ${h}:${m}:${s}`;
+}
+
+function getCurrentSlot(){
+  const now = new Date();
+  const dow = now.getDay();
+  const cur = toMinutes(now.getHours(), now.getMinutes());
+  const slots = SCHEDULE[dow];
+  if(!slots) return null;
+  for(const s of slots){
+    const st = toMinutes(s[0],s[1]);
+    const en = toMinutes(s[2],s[3]);
+    if(cur >= st && cur < en) return s;
+  }
+  return null;
+}
+
+function getNextSlot(){
+  const now = new Date();
+  const dow = now.getDay();
+  const cur = toMinutes(now.getHours(), now.getMinutes());
+  const slots = SCHEDULE[dow];
+  if(!slots) return null;
+  for(const s of slots){
+    const st = toMinutes(s[0],s[1]);
+    if(st > cur) return s;
+  }
+  return null;
+}
+
+function getNextClass(){
+  const now = new Date();
+  const dow = now.getDay();
+  const cur = toMinutes(now.getHours(), now.getMinutes());
+  const slots = SCHEDULE[dow];
+  if(!slots) return null;
+  for(const s of slots){
+    if(s[5]==='class'){
+      const st = toMinutes(s[0],s[1]);
+      if(st > cur) return s;
+    }
+  }
+  return null;
+}
+
+function updateHome(){
+  const now = new Date();
+  const dow = now.getDay();
+
+  // Now card
+  if(dow===0){
+    document.getElementById('nowTask').textContent = 'Free Day – Rest & Recharge 🌞';
+    document.getElementById('nowTimeRange').textContent = 'Sunday';
+    document.getElementById('nowEmoji').textContent = '🌞';
+  } else {
+    const slot = getCurrentSlot();
+    if(slot){
+      document.getElementById('nowTask').textContent = slot[4];
+      document.getElementById('nowTimeRange').textContent = `${fmtTime(slot[0],slot[1])} – ${fmtTime(slot[2],slot[3])}`;
+      document.getElementById('nowEmoji').textContent = TYPE_EMOJI[slot[5]]||'📚';
+    } else {
+      document.getElementById('nowTask').textContent = 'No scheduled task right now';
+      document.getElementById('nowTimeRange').textContent = 'Free time';
+      document.getElementById('nowEmoji').textContent = '☕';
+    }
+  }
+
+  // Next task
+  const next = getNextSlot();
+  if(next){
+    document.getElementById('nextTaskPreview').textContent =
+      `${TYPE_EMOJI[next[5]]} ${next[4]} — at ${fmtTime(next[0],next[1])}`;
+  } else {
+    document.getElementById('nextTaskPreview').textContent = 'No more tasks today. Well done! 🎉';
+  }
+
+  // Countdown to next class
+  const nClass = getNextClass();
+  const cdCard = document.getElementById('countdownCard');
+  if(nClass){
+    const h2 = now.getHours(), m2 = now.getMinutes(), s2 = now.getSeconds();
+    const curSec = h2*3600+m2*60+s2;
+    const classSec = nClass[0]*3600+nClass[1]*60;
+    const diff = classSec - curSec;
+    if(diff > 0){
+      const hh = Math.floor(diff/3600);
+      const mm = Math.floor((diff%3600)/60);
+      const ss = diff%60;
+      cdCard.classList.add('show');
+      document.getElementById('countdownLabel').textContent = '⏱ Next class in';
+      document.getElementById('countdownTimer').textContent = `${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+      document.getElementById('countdownDesc').textContent = `${nClass[4]} at ${fmtTime(nClass[0],nClass[1])}`;
+    } else {
+      // Class in progress?
+      const classEndSec = nClass[2]*3600+nClass[3]*60;
+      if(curSec >= classSec && curSec < classEndSec){
+        cdCard.classList.add('show');
+        document.getElementById('countdownLabel').textContent = '🔴 Class in progress';
+        document.getElementById('countdownTimer').textContent = '🎓';
+        document.getElementById('countdownDesc').textContent = nClass[4];
+      } else {
+        cdCard.classList.remove('show');
+      }
+    }
+  } else {
+    cdCard.classList.remove('show');
+  }
+
+  // Progress
+  const dk = todayKey();
+  const tasks = getOrCreateTasks(dk, dow);
+  const total = tasks.length;
+  const done = tasks.filter(t=>t.done).length;
+  const pct = total>0 ? Math.round(done/total*100) : 0;
+  document.getElementById('progressPct').textContent = pct+'%';
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressSub').textContent = `${done} of ${total} tasks completed`;
+
+  // Notification check
+  checkNotif(now);
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function requestNotifPermission(){
+  if(!('Notification' in window)){ showToast('Notifications not supported in this browser'); return; }
+  Notification.requestPermission().then(perm=>{
+    if(perm==='granted'){
+      document.getElementById('notifBanner').classList.add('hidden');
+      showToast('🔔 Notifications enabled!');
+    } else {
+      showToast('Notifications blocked. Please allow in browser settings.');
+    }
+  });
+}
+
+function sendNotif(title, body){
+  if(Notification.permission==='granted'){
+    new Notification(title, {body, icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text y="52" font-size="52">💊</text></svg>'});
+  }
+  showToast(`🔔 ${title}: ${body}`);
+}
+
+function checkNotif(now){
+  const dow = now.getDay();
+  const slots = SCHEDULE[dow];
+  if(!slots) return;
+  const curMin = toMinutes(now.getHours(), now.getMinutes());
+  for(const s of slots){
+    const startMin = toMinutes(s[0],s[1]);
+    const diff = startMin - curMin;
+    const key = `${dow}_${s[0]}_${s[1]}`;
+    if((diff===10||diff===5) && lastNotifSlotKey!==key){
+      lastNotifSlotKey = key;
+      if(s[5]==='class'){
+        sendNotif('📚 Class Starting Soon!', `${s[4]} begins in ${diff} minutes!`);
+      } else {
+        sendNotif(`⏰ Upcoming Task`, `${s[4]} starts in ${diff} minutes`);
+      }
+    }
+  }
+  // End of day check at 22:30
+  if(now.getHours()===22 && now.getMinutes()===30){
+    const key = `eod_${dow}`;
+    if(lastNotifSlotKey!==key){
+      lastNotifSlotKey = key;
+      showEodPopup();
+    }
+  }
+}
+
+function showEodPopup(){
+  document.getElementById('popupEmoji').textContent='🌙';
+  document.getElementById('popupTitle').textContent='End of Day Check-in';
+  document.getElementById('popupSub').textContent='Did you complete your tasks today? Head to the Tasks section to review!';
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ============================================================
+// TIMETABLE SECTION
+// ============================================================
+function buildDayChips(){
+  const container = document.getElementById('dayChips');
+  container.innerHTML = '';
+  DAYS.forEach((d,i)=>{
+    const btn = document.createElement('button');
+    btn.className='day-chip'+(i===viewedTTDay?' active':'');
+    btn.textContent = DAY_SHORT[i];
+    btn.onclick=()=>{ viewedTTDay=i; buildDayChips(); renderTimetable(); };
+    container.appendChild(btn);
+  });
+}
+
+function renderTimetable(){
+  const dow = viewedTTDay;
+  document.getElementById('ttDayName').textContent = DAYS[dow];
+  // Compute date
+  const today = new Date();
+  const todayDow = today.getDay();
+  let diff = dow - todayDow;
+  const d = new Date(today); d.setDate(d.getDate()+diff);
+  document.getElementById('ttDayDate').textContent = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  const sundayCard = document.getElementById('sundayCard');
+  const slotsDiv = document.getElementById('ttSlots');
+  if(dow===0){
+    sundayCard.classList.add('show'); slotsDiv.innerHTML=''; return;
+  }
+  sundayCard.classList.remove('show');
+  const slots = SCHEDULE[dow]||[];
+  const now = new Date();
+  const curMin = toMinutes(now.getHours(), now.getMinutes());
+  const isToday = dow===now.getDay();
+  slotsDiv.innerHTML = slots.map(s=>{
+    const st=toMinutes(s[0],s[1]), en=toMinutes(s[2],s[3]);
+    const active = isToday&&curMin>=st&&curMin<en;
+    const isClass = s[5]==='class';
+    return `<div class="slot-card${active?' active-slot':''}${isClass?' class-slot':''}">
+      <div class="slot-time">${fmtTime(s[0],s[1])}<br>–<br>${fmtTime(s[2],s[3])}</div>
+      <div>
+        <div class="slot-name">${TYPE_EMOJI[s[5]]} ${s[4]}</div>
+        <span class="slot-badge badge-${active?'active':TYPE_BADGE[s[5]]}">${active?'▶ NOW':TYPE_LABEL[s[5]]}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function changeDay(dir){
+  viewedTTDay = (viewedTTDay+dir+7)%7;
+  buildDayChips();
+  renderTimetable();
+}
+
+// ============================================================
+// TODO SECTION
+// ============================================================
+function renderTodo(){
+  const offset = viewedTodoOffset;
+  const d = dateForOffset(offset);
+  const dow = d.getDay();
+  const dk = todayKey(offset);
+
+  const labels = {'-1':'Yesterday','0':'Today','1':'Tomorrow'};
+  document.getElementById('todoDateLabel').textContent =
+    (labels[offset]||d.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}));
+  document.getElementById('todoNavInfo').textContent =
+    `(${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})})`;
+
+  const listDiv = document.getElementById('todoList');
+
+  if(dow===0){
+    listDiv.innerHTML=`<div class="empty-state"><div class="big-emoji">🌞</div>Sunday – Free Day! Enjoy your rest.</div>`;
+    return;
+  }
+
+  const tasks = getOrCreateTasks(dk, dow);
+  if(!tasks.length){
+    listDiv.innerHTML=`<div class="empty-state"><div class="big-emoji">🎉</div>No tasks scheduled.</div>`;
+    return;
+  }
+
+  listDiv.innerHTML = tasks.map((t,i)=>`
+    <div class="todo-item${t.done?' done':''}" id="todo_${i}">
+      <div class="todo-check" onclick="toggleTask(${i})">${t.done?'✓':''}</div>
+      <div style="flex:1">
+        <div class="todo-text">${TYPE_EMOJI[t.type]} ${t.label}</div>
+        <div class="todo-time">${t.start} – ${t.end}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleTask(i){
+  const offset = viewedTodoOffset;
+  const d = dateForOffset(offset);
+  const dk = todayKey(offset);
+  const dow = d.getDay();
+  const tasks = getOrCreateTasks(dk, dow);
+  tasks[i].done = !tasks[i].done;
+  saveTasks(dk, tasks);
+  renderTodo();
+  if(offset===0) updateHome();
+}
+
+function todoNavDay(delta){
+  viewedTodoOffset = (delta===0)?0:viewedTodoOffset+delta;
+  if(viewedTodoOffset>1) viewedTodoOffset=1;
+  if(viewedTodoOffset<-6) viewedTodoOffset=-6;
+  renderTodo();
+}
+
+function submitDay(){
+  const dk = todayKey();
+  const dow = new Date().getDay();
+  const tasks = getOrCreateTasks(dk, dow);
+  const done = tasks.filter(t=>t.done).length;
+  const total = tasks.length;
+  const pct = total>0?Math.round(done/total*100):0;
+
+  document.getElementById('popupEmoji').textContent = pct===100?'🎉':'📋';
+  document.getElementById('popupTitle').textContent = pct===100?'Amazing Work! 🌟':'Day Submitted';
+  document.getElementById('popupSub').textContent =
+    `You completed ${done}/${total} tasks (${pct}%). ${pct===100?'Outstanding dedication!':'Keep pushing forward, future pharmacist! 💊'}`;
+  document.getElementById('overlay').classList.add('show');
+
+  // Save summary
+  const hist = JSON.parse(localStorage.getItem('history')||'{}');
+  hist[dk] = {done, total, pct, day: DAYS[dow]};
+  localStorage.setItem('history', JSON.stringify(hist));
+  updateHome();
+  renderHistory();
+}
+
+// ============================================================
+// HISTORY SECTION
+// ============================================================
+function renderHistory(){
+  const hist = JSON.parse(localStorage.getItem('history')||'{}');
+  const keys = Object.keys(hist).sort().reverse().slice(0,14);
+  const div = document.getElementById('histList');
+  if(!keys.length){
+    div.innerHTML=`<div class="empty-state"><div class="big-emoji">📊</div>No history yet. Complete your tasks to see progress here!</div>`;
+    return;
+  }
+  div.innerHTML = keys.map(k=>{
+    const h = hist[k];
+    const d = new Date(k);
+    const label = d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    return `<div class="hist-day">
+      <div class="hist-day-title">${h.day} – ${label}</div>
+      <div class="hist-stat">${h.done}/${h.total} tasks — ${h.pct}% complete</div>
+      <div class="hist-bar-bg"><div class="hist-bar-fill" style="width:${h.pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchSection(name, btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  btn.classList.add('active');
+
+  if(name==='timetable'){ buildDayChips(); renderTimetable(); }
+  if(name==='todo'){ viewedTodoOffset=0; renderTodo(); }
+  if(name==='history') renderHistory();
+}
+
+// ============================================================
+// POPUP / TOAST
+// ============================================================
+function closePopup(){ document.getElementById('overlay').classList.remove('show'); }
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init(){
+  const now = new Date();
+  viewedTTDay = now.getDay();
+
+  // Notification banner
+  if(Notification.permission==='granted' || !('Notification' in window)){
+    document.getElementById('notifBanner').classList.add('hidden');
+  }
+
+  updateClock();
+  updateHome();
+  renderTodo();
+
+  setInterval(()=>{ updateClock(); updateHome(); }, 1000);
+}
+
+init();
+
+// ============================================================
+// PWA INSTALL PROMPT
+// ============================================================
+let deferredInstallPrompt = null;
+
+// Android/Chrome: catch the browser's install event
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Don't show if user already dismissed
+  if(localStorage.getItem('installDismissed')) return;
+  // Show banner after 2 seconds
+  setTimeout(()=>{
+    document.getElementById('installBanner').classList.add('visible');
+  }, 2000);
+});
+
+// If app was successfully installed
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+  deferredInstallPrompt = null;
+  showToast('💊 Pharmasys added to your home screen!');
+});
+
+function doInstall(){
+  if(!deferredInstallPrompt) return;
+  document.getElementById('installBanner').classList.remove('visible');
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(choice => {
+    if(choice.outcome === 'accepted'){
+      showToast('💊 Installing Pharmasys...');
+    }
+    deferredInstallPrompt = null;
+  });
+}
+
+function dismissInstall(){
+  document.getElementById('installBanner').classList.remove('visible');
+  localStorage.setItem('installDismissed','1');
+}
+
+// iOS Safari detection
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
+}
+function isInStandaloneMode(){
+  return window.navigator.standalone === true;
+}
+
+// Show iOS instructions if on iOS Safari and not already installed
+if(isIos() && !isInStandaloneMode() && !localStorage.getItem('iosDismissed')){
+  setTimeout(()=>{
+    document.getElementById('iosBanner').classList.add('visible');
+  }, 2500);
+}
+
+function dismissIos(){
+  document.getElementById('iosBanner').classList.remove('visible');
+  localStorage.setItem('iosDismissed','1');
+}
+</script>
+
+<!-- INSTALL BANNERS (outside #app so they float freely) -->
+<div id="installBanner">
+  <div class="install-icon">💊</div>
+  <div class="install-text">
+    <div class="install-title">Add to Home Screen</div>
+    <div class="install-sub">Install Pharmasys for quick one-tap access — works offline!</div>
+  </div>
+  <div class="install-actions">
+    <button class="install-btn" onclick="doInstall()">⬇ Install</button>
+    <button class="install-dismiss" onclick="dismissInstall()">Not now</button>
+  </div>
+</div>
+
+<div id="iosBanner">
+  <div class="ios-banner-title">📲 Add to Home Screen</div>
+  <ul class="ios-steps">
+    <li><span class="ios-step-num">1</span>Tap the <strong>Share</strong> button ⬆️ at the bottom of Safari</li>
+    <li><span class="ios-step-num">2</span>Scroll and tap <strong>"Add to Home Screen"</strong></li>
+    <li><span class="ios-step-num">3</span>Tap <strong>"Add"</strong> — Pharmasys appears on your home screen!</li>
+  </ul>
+  <button class="ios-dismiss" onclick="dismissIos()">Got it ✓</button>
+</div>
+
+</body>
+</html>
+
