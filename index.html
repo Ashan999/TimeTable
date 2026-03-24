@@ -466,9 +466,132 @@
   .ios-steps li:last-child { border-bottom:none; }
   .ios-step-num { width:20px; height:20px; border-radius:50%; background:var(--pink-200); color:var(--pink-600); font-weight:700; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .ios-dismiss { margin-top:12px; width:100%; padding:9px; border-radius:12px; background:var(--pink-100); border:none; color:var(--pink-600); font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:600; cursor:pointer; }
+
+  /* ===== MOTIVATION POPUP ===== */
+  #motivationOverlay {
+    position: fixed; inset: 0;
+    background: rgba(180, 80, 130, 0.22);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    z-index: 9000;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  #motivationOverlay.show { opacity: 1; pointer-events: all; }
+
+  #motivationCard {
+    background: rgba(255, 240, 248, 0.72);
+    border: 1.5px solid rgba(255, 180, 210, 0.55);
+    border-radius: 28px;
+    padding: 32px 26px 26px;
+    max-width: 360px; width: 100%;
+    box-shadow: 0 8px 48px rgba(233,30,140,0.22), 0 2px 16px rgba(255,182,193,0.18);
+    text-align: center;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    animation: motivPopIn 0.45s cubic-bezier(.34,1.56,.64,1) both;
+    position: relative;
+    overflow: hidden;
+  }
+  #motivationCard::before {
+    content: '';
+    position: absolute; top: -60px; right: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(255,182,193,0.45) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  #motivationCard::after {
+    content: '';
+    position: absolute; bottom: -50px; left: -30px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(232,213,245,0.5) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  @keyframes motivPopIn {
+    from { transform: scale(0.78) translateY(30px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .motiv-flowers {
+    font-size: 1.6rem; letter-spacing: 4px; margin-bottom: 10px;
+    animation: floatFlowers 3s ease-in-out infinite;
+  }
+  @keyframes floatFlowers {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  .motiv-quote {
+    font-size: 0.93rem; color: #6b2060;
+    line-height: 1.65; margin: 10px 0 18px;
+    font-style: italic; font-weight: 400;
+    min-height: 60px;
+  }
+
+  .motiv-question {
+    font-size: 0.88rem; font-weight: 600; color: #c2185b;
+    margin-bottom: 18px; line-height: 1.4;
+  }
+
+  .motiv-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .motiv-btn-yes {
+    padding: 12px 22px;
+    background: linear-gradient(135deg, #f06292, #e91e8c);
+    color: #fff; border: none; border-radius: 30px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+    cursor: pointer; box-shadow: 0 4px 18px rgba(233,30,140,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    position: relative; overflow: hidden;
+  }
+  .motiv-btn-yes:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(233,30,140,0.45); }
+  .motiv-btn-yes:active { transform: scale(0.96); }
+
+  .motiv-btn-no {
+    padding: 12px 22px;
+    background: rgba(255,255,255,0.6);
+    color: #c2185b; border: 1.5px solid rgba(255,130,180,0.45);
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500;
+    cursor: pointer; backdrop-filter: blur(8px);
+    transition: transform 0.15s, background 0.2s;
+  }
+  .motiv-btn-no:hover { background: rgba(255,210,230,0.6); transform: translateY(-1px); }
+
+  /* Floating hearts animation */
+  .heart-burst {
+    position: fixed; inset: 0; z-index: 9500;
+    pointer-events: none;
+  }
+  .heart-burst span {
+    position: absolute;
+    font-size: 1.6rem;
+    animation: heartFly 1.2s ease-out forwards;
+    opacity: 0;
+  }
+  @keyframes heartFly {
+    0%   { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-160px) scale(1.5); }
+  }
 </style>
 </head>
 <body>
+
+<!-- ===== MOTIVATION POPUP ===== -->
+<div id="motivationOverlay">
+  <div id="motivationCard">
+    <div class="motiv-flowers">🌸🌺🌸</div>
+    <div class="motiv-quote" id="motivQuote">Loading...</div>
+    <div class="motiv-question">අද හොඳින් වැඩ ටික කරනවා නේද? 💖</div>
+    <div class="motiv-btns">
+      <button class="motiv-btn-yes" onclick="motivYes()">ඔව් අයියේ ❤️</button>
+      <button class="motiv-btn-no" onclick="motivNo()">පස්සේ කරන්නම් 🙄</button>
+    </div>
+  </div>
+</div>
+<div class="heart-burst" id="heartBurst"></div>
 
 <div id="app">
   <!-- HEADER -->
@@ -1157,6 +1280,223 @@ function init(){
 
   setInterval(()=>{ updateClock(); updateHome(); }, 1000);
 }
+
+// ============================================================
+// MOTIVATION POPUP
+// ============================================================
+const MOTIV_MESSAGES = [
+  "මගේ ලෝකය ලස්සන කරපු ඔයාට අද දවසත් සුබම සුබ වෙන්න ඕනේ ❤️",
+  "ඔයාට පුළුවන් මැණික, මේ ටික ඉවර කරලා අපි ඉක්මනින් මුණගැහෙමු! 💪",
+  "බබා පාඩම් කරන අතරතුර වතුර ටිකක් එහෙම බොන්න අමතක කරන්න එපා හොඳේ.. 🥛",
+  "අද දවසේ වැඩ ටික ලස්සනට කරමු. මම හැමදාමත් ඔයා එක්ක ඉන්නවා මැණික. ❤️",
+  "මගේ දක්ෂ කෙල්ලට මේ Pharmacy Exam එක නතිං. වැඩ ටික පටන් ගමු නේද? 💪",
+  "ඔයා මහන්සි වෙලා ඉගෙන ගන්න එකේ ප්‍රතිඵල අපිට ඉක්මනටම හම්බවෙයි. Love you! 😍",
+  "අදත් මගේ බබා ලස්සනට හිනා වෙලා වැඩ ටික කරන්න. මම බලන් ඉන්නවා.. ✨",
+  "ඔයා දන්නවද? ඔයා ඉගෙන ගන්නකොට තවත් ලස්සනයි! 📖 දැන් වැඩ පටන් ගමු.",
+  "බබාට බඩගිනිද? පාඩම් කරන ගමන් මොනවා හරි කන්න. 🍎",
+  "අපේ ලස්සන අනාගතය වෙනුවෙන් අද පොඩ්ඩක් මහන්සි වෙමු නේද? 🏠❤️",
+  "මම ඩුබායි වල හිටියත් මගේ හිත හැමතිස්සෙම ඔයා ළඟ බබා. ❤️",
+  "බඩගිනි වෙන්න දෙන්න එපා, වෙලාවට කෑම කන්න හොඳේ.. 🍎",
+  "ඔයා මහන්සි වෙනවා දැක්කම මට දුකයි, ඒත් ඔයාගේ හීන වෙනුවෙන් මම හැමදාම ඉන්නවා. 🥰",
+  "පාඩම් කරලා ඇස් රිදෙනවා නම් පොඩ්ඩක් ඇස් පියන් ඉන්න. 😌",
+  "වතුර වීදුරුවක් බොමුද? ඒක ඔයාට තවත් උනන්දුවක් දෙයි. 🥛",
+  "අද දවස ඔයා වගේම ලස්සන වෙන්න ඕනේ මගේ පණ. ❤️",
+  "ඔයාගේ හිනාව තමයි මගේ ලොකුම සතුට. අදත් හිනාවෙලා වැඩ පටන් ගන්න. 😊",
+  "පොඩ්ඩක් ඇවිදලා එන්න, මනස නිදහස් කරගන්න මැණික. 🚶‍♀️✨",
+  "ඔයා දන්නවද? ඔයා තමයි මගේ ලෝකයේ ඉන්න දක්ෂම කෙල්ල. 😍",
+  "මහන්සි වුණාම මාව මතක් කරන්න, මම හැමදාම ඔයාගේ හයියට ඉන්නවා. 👨‍👩‍👦",
+  "බෑ කියන්න බෑ! දැන්ම වැඩ පටන් ගන්න ඕනේ.. ඉක්මන් කරන්න! 😤❤️",
+  "කම්මැලිකම අයින් කරලා පොත අතට ගන්න බලන්න. 👊😋",
+  "පස්සේ කරන්නේ නැහැ, දැන්ම කරමු. මම බලන් ඉන්නේ! 👀",
+  "අද වැඩ ටික ඉවර කළොත් විතරයි රෑට වැඩිපුර වෙලා කතා කරන්නේ.. 📞❤️",
+  "ඔයා දන්නවනේ මම ටිකක් සැරයි කියලා.. ඉක්මනට පාඩම් කරන්න! 😘",
+  "සුබ උදෑසනක් මගේ මැණික! අද දවස ජයග්‍රහණයෙන් පටන් ගමු. ☀️",
+  "ඊයේ දවසට වඩා අද දවස සාර්ථක කරගන්න ඔයාට ශක්තිය ලැබෙන්න ඕනේ. ❤️",
+  "රෑ වැඩි වෙනකම් නිදි මරන්න එපා, සෞඛ්‍යයත් වැදගත්. 😴",
+  "අද කරපු හැම දේකටම ගොඩක් ස්තුතියි බබා. ඔයා සුපිරි! ✨",
+  "සතුටින් ඉන්න, එතකොට ඕනෑම දෙයක් ලේසියෙන් ඉගෙන ගන්න පුළුවන්. 😍",
+  "Pharmacy කියන්නේ වගකීමක් තියෙන විෂයක්, ඒක ඔයා ලස්සනට කරයි. 🏥",
+  "Assignment එක අමාරුද? හෙමින් කියවලා බලන්න, ඔයාට ඒක තේරෙයි. 📝",
+  "හැම වැරදීමක්ම අලුත් පාඩමක්. වැරදුණාට කමක් නැහැ ආයෙත් උත්සාහ කරන්න. 💪",
+  "අද ඔයා කරන කැප කිරීම අපේ අනාගතයේ සතුටට හේතු වෙයි. 🏠❤️",
+  "ඔයාගේ ඉවසීම සහ උත්සාහය මාව පුදුම කරනවා මැණික. 😍",
+  "අමාරු කාලය ඉක්මනින් ඉවර වෙයි, අපි දෙන්නා සතුටින් ඉමු. 👩‍❤️‍👨",
+  "ඔයාගේ හිතේ තියෙන හීන හැබෑ කරගන්න මුළු ලෝකයම ඔයාට උදව් කරයි. ✨",
+  "දැන්ම පටන් ගත්තොත් ඉක්මනට ඉවර කරන්න පුළුවන් නේද? ⏳",
+  "ඔයා ලියන අත් අකුරු වගේම ඔයාගේ අනාගතයත් ලස්සන වෙයි. ✍️❤️",
+  "මට ඔයා ගැන තියෙන්නේ පුදුම ආඩම්බරයක් බබා. ❤️",
+  "මේ ලෝකේ කරන්න බැරි දෙයක් නැහැ, විශේෂයෙන්ම ඔයාට. 💪",
+  "පාඩම් කරලා ඉවර වෙලා සින්දුවක් අහන්න, මනස සැහැල්ලු කරගන්න. 🎧",
+  "හිතේ ශක්තිය තමයි ලොකුම දේ, ඒක ඔයාට උපරිමයෙන් තියෙනවා. 🌟",
+  "අද දවසේ හැම තත්පරයක්ම වටිනවා, ඒක ප්‍රයෝජනයට ගන්න. ⏰",
+  "බුදු සරණයි මගේ පණ! පරිස්සමෙන් වැඩ ටික කරන්න. 🙏",
+  "ඔයාගේ ජයග්‍රහණය දකින්න මම ඇඟිලි ගැන ගැන ඉන්නේ. 🏁",
+  "අද දවසේ වැඩ ඉවර කරලා මට පණිවිඩයක් දාන්න. මම බලන් ඉන්නවා. 📱",
+  "සමහර දේවල් වලට කාලය අවශ්‍යයි, ඉවසීමෙන් වැඩ කරන්න. ⏳❤️",
+  "ඔයාගේ මේ කැපවීම කවදාහරි හැමෝම අගය කරයි. 😍",
+  "අන්තිම තත්පරය වෙනකම් මම ඔයාට ආදරෙයි. හොඳට ඉගෙන ගන්න! ❤️",
+  "ඔයාගේ හීන වලට යන ගමන අදින් පටන් ගන්න. මම හැමදාම ඔයා පිටුපසින් ඉන්නවා. ❤️",
+  "කම්මැලිකම කියන්නේ තාවකාලික දෙයක්, ඒත් ඔයාගේ ජයග්‍රහණය සදාකාලිකයි. 💪",
+  "අද දවසේ පොඩි කැපවීමක් හෙට දවස ලොකු සතුටකට හේතු වෙයි. ✨",
+  "දක්ෂ ඖෂධවේදිනියක් වෙන්න පෙරුම් පුරන මගේ මැණිකට සුබම සුබ දවසක්! 💊",
+  "ඔයාට තියෙන්නේ පුදුම ඉවසීමක්. ඒක තමයි ඔයාගේ ලොකුම ශක්තිය. 😍",
+  "වැඩ ගොඩක් තිබුණට කලබල වෙන්න එපා, හෙමින් එකින් එක ඉවර කරමු. 📝",
+  "ඔයා පාඩම් කරන දිහා මම ආසාවෙන් බලාගෙන ඉන්නවා. ❤️",
+  "අද ඔයා කරන දේ ඔයාගේ අනාගතය තීරණය කරයි. ඒක ලස්සනට කරමු නේද? 🌟",
+  "මගේ ලෝකයේ ඉන්න දක්ෂම සහ ලස්සනම ශිෂ්‍යාව ඔයා තමයි! 👩‍⚕️❤️",
+  "විභාගය ගැන බය වෙන්න එපා, ඔයා දැනටමත් ඒක දිනලා ඉවරයි. 💪",
+  "පාඩම් කරන අතරතුර පොඩ්ඩක් ඇස් දෙකට විවේකයක් දෙන්න මැණික. 😌",
+  "ඔයා මහන්සි වෙනවා දැක්කම මටත් මහන්සි වගේ. පරිස්සමෙන් වැඩ කරන්න. ❤️",
+  "බෝතලයට වතුර පුරවලා ළඟින් තියාගත්තා නේද? 🥛",
+  "ඔයාගේ සෞඛ්‍යය තමයි මට වැදගත්ම දේ. වැඩ අතරතුර පොඩ්ඩක් කන්න. 🍎",
+  "මම ළඟ නැති වුණාට මගේ ආදරේ හැමදාම ඔයාව ආරක්ෂා කරයි. 🥰",
+  "අද දවසත් හිනාවෙලා සතුටින් පටන් ගමු නේද මගේ පණ? 😊",
+  "ඔයා ගැන හිතද්දී මට දැනෙන්නේ ලොකු ආඩම්බරයක් බබා. ❤️",
+  "හිතේ තියෙන හැම ප්‍රශ්නයක්ම අමතක කරලා පාඩම් වැඩට හිත දෙන්න. ✨",
+  "අමාරු කොටස් තියෙනවා නම් මට කියන්න, අපි දෙන්නා එකතු වෙලා විසඳමු. 🤝",
+  "ඔයා තමයි මගේ ජීවිතේ තියෙන වටිනාම වස්තුව. පරිස්සමෙන් ඉන්න. ❤️",
+  "ඔයාගේ උත්සාහය කවදාවත් අපතේ යන්නේ නැහැ. 🏆",
+  "අද දවසේ අභියෝග ජයගන්න ඔයාට ශක්තිය ලැබෙන්න ඕනේ! 💪",
+  "ඔයා කරන්නේ ලොකු සේවයක්, ඉගෙන ගන්න එකත් පිනක්. 😇",
+  "ඔයාගේ ලස්සන අනාගතය වෙනුවෙන් අද ටිකක් මහන්සි වෙමු නේද? 🏠❤️",
+  "හැමදාම අලුත් දෙයක් ඉගෙන ගන්න ලැබෙන එක වාසනාවක්. 📖",
+  "ඔයාගේ මේ කැපවීම අපේ පවුලට ලොකු ආලෝකයක් මැණික. 😍",
+  "අද දවසේ targets ටික ලස්සනට ඉවර කරන්න මගේ සුබ පැතුම්! 🎯",
+  "කවදාහරි දවසක ඔයා මේ දවස් ගැන සතුටින් මතක් කරයි. ✨",
+  "අනිත් අයට වඩා ඔයා ගොඩක් දක්ෂයි, ඒක අමතක කරන්න එපා. ❤️",
+  "වැටෙන හැම පාරම ශක්තිමත්ව නැගිටින්න. මම ඉන්නවා ඔයා අල්ලගන්න. 🤗",
+  "දැන්ම පටන් ගත්තේ නැත්නම් මම ඩුබායි ඉඳන් ඇවිත් කිචි කවනවා! 😋❤️",
+  "බෑ කියන වචනය මගේ බබාගේ ශබ්දකෝෂයේ නැහැ නේද? 😉",
+  "ඉක්මනට වැඩ ඉවර කළොත් මගෙන් ඔයාට special surprise එකක් තියෙනවා! 🎁",
+  "අද වැඩ ටික කරන්නේ නැතිව මගෙන් බේරෙන්න බැහැ හොඳේ.. 😤❤️",
+  "ඔයා පාඩම් කරලා ඉවර වෙනකම් මම බලන් ඉන්නවා. 😘",
+  "අද දවසේ ඔයා කරපු හැම දේකටම ගොඩක් ස්තුතියි. ඔයා මගේ වීරවරිය! 🦸‍♀️❤️",
+  "දැන් පොත් ටික අකුලලා තියලා සුව නින්දක් ගන්න. 😴",
+  "හීනෙන් මාව පෙනෙන්න ඕනේ හොඳේ! බුදු සරණයි මැණික. 🌙",
+  "හෙට දවස මීටත් වඩා ලස්සන වෙයි. සතුටින් ඉන්න. 🥰",
+  "අද දවස සාර්ථකව නිමා කරපු මගේ දක්ෂ කෙල්ලට උම්මා එකක්! 😘❤️",
+  "විශ්වාසය තියන්න, ඔයාට ඕනෑම දෙයක් කරන්න පුළුවන්. 🌟",
+  "අමාරුම වෙලාව තමයි ජයග්‍රහණයට ආසන්නම වෙලාව. 💪",
+  "ඔයාගේ දෑතින් රෝගීන් සුවපත් කරන දවස වැඩි ඈතක නැහැ. 🏥",
+  "සෑම උදෑසනක්ම අලුත් බලාපොරොත්තුවක්. ඒක අරගන්න. ☀️",
+  "ඔයාගේ ජයග්‍රහණය මගේ ලොකුම සතුටයි බබා. ❤️",
+  "අවංකව වැඩ කරන්න, ප්‍රතිඵලය ඉබේම ලැබෙයි. ✨",
+  "අද දවස ඔයාගේ ජීවිතේ අමතක නොවන දවසක් කරගන්න. 🌈",
+  "සතුටින් ඉගෙන ගන්න, එතකොට මතකය වැඩි වෙයි. 😊",
+  "ඔයා ඉන්නේ නිවැරදි මාර්ගයේ, දිගටම යන්න මැණික. 🏃‍♀️❤️",
+  "අන්තිම තත්පරය වෙනකම් මම ඔයාට ආදරෙයි. ❤️",
+  "අද දවස ඔයාගේ හීන වලට තවත් පියවරක් සමීප වෙන්න ලැබෙන දවසක්. ❤️",
+  "පොත් කියවන ඔයා හරිම ලස්සනයි. අදත් හොඳින් පාඩම් කරමු නේද? 📖✨",
+  "අමාරු කොටස් අතහරින්න එපා, හෙමින් හෙමින් කරන්න. ඔයාට පුළුවන්! 💪",
+  "අනාගතයේ දක්ෂ Pharmacist කෙනෙක් වෙන්න අද කරන මහන්සිය ගොඩක් වටිනවා. 💊",
+  "ඔයාගේ දක්ෂතාවය ගැන මට ලොකු විශ්වාසයක් තියෙනවා බබා. 🌟",
+  "වැඩ ගොඩක් තිබුණත් කලබල වෙන්න එපා. එකින් එක ලස්සනට කරමු. ❤️",
+  "ඔයා ඉගෙන ගන්න විදිහ මටත් ලොකු ආඩම්බරයක් මැණික. 😍",
+  "මේ මහන්සිය කවදාහරි ලස්සන ජයග්‍රහණයකින් අවසන් වෙයි. 🏆",
+  "පාඩම් කරන අතරතුර පොඩි විවේකයක් ගන්නත් අමතක කරන්න එපා. ☕",
+  "අද දවසේ targets ටික ලස්සනට ඉවර කරන්න මගේ සුබ පැතුම්! 🎯",
+  "මම ඩුබායි වල හිටියත් මගේ හිත හැමතිස්සෙම ඔයා ළඟ බබා. ❤️",
+  "බඩගිනි වෙන්න දෙන්න එපා, වෙලාවට කෑම කන්න හොඳේ.. 🍎",
+  "ඔයා මහන්සි වෙනවා දැක්කම මට දුකයි, ඒත් ඔයාගේ හීන වෙනුවෙන් මම හැමදාම ඉන්නවා. 🥰",
+  "පාඩම් කරලා ඇස් රිදෙනවා නම් පොඩ්ඩක් ඇස් පියන් ඉන්න. 😌",
+  "වතුර වීදුරුවක් බොමුද? ඒක ඔයාට තවත් උනන්දුවක් දෙයි. 🥛",
+  "අද දවස ඔයා වගේම ලස්සන වෙන්න ඕනේ මගේ පණ. ❤️",
+  "ඔයාගේ හිනාව තමයි මගේ ලොකුම සතුට. අදත් හිනාවෙලා වැඩ පටන් ගන්න. 😊",
+  "පොඩ්ඩක් ඇවිදලා එන්න, මනස නිදහස් කරගන්න මැණික. 🚶‍♀️✨",
+  "ඔයා දන්නවද? ඔයා තමයි මගේ ලෝකයේ ඉන්න දක්ෂම කෙල්ල. 😍",
+  "මහන්සි වුණාම මාව මතක් කරන්න, මම හැමදාම ඔයාගේ හයියට ඉන්නවා. 👨‍👩‍👦",
+  "අද වැඩ ටික ඉවර කළොත් විතරයි රෑට වැඩිපුර වෙලා කතා කරන්නේ.. 📞❤️",
+  "ඔයා දන්නවනේ මම ටිකක් සැරයි කියලා.. ඉක්මනට පාඩම් කරන්න! 😘",
+  "සුබ උදෑසනක් මගේ මැණික! අද දවස ජයග්‍රහණයෙන් පටන් ගමු. ☀️",
+  "ඊයේ දවසට වඩා අද දවස සාර්ථක කරගන්න ඔයාට ශක්තිය ලැබෙන්න ඕනේ. ❤️",
+  "රෑ වැඩි වෙනකම් නිදි මරන්න එපා, සෞඛ්‍යයත් වැදගත්. 😴",
+  "අද කරපු හැම දේකටම ගොඩක් ස්තුතියි බබා. ඔයා සුපිරි! ✨",
+  "සතුටින් ඉන්න, එතකොට ඕනෑම දෙයක් ලේසියෙන් ඉගෙන ගන්න පුළුවන්. 😍",
+  "විභාගය ගැන බය වෙන්න එපා, ඔයා දැනටමත් ඒක දිනලා ඉවරයි. 💪",
+  "පාඩම් කරන අතරතුර පොඩ්ඩක් ඇස් දෙකට විවේකයක් දෙන්න මැණික. 😌",
+  "ඔයා මහන්සි වෙනවා දැක්කම මටත් මහන්සි වගේ. පරිස්සමෙන් වැඩ කරන්න. ❤️",
+  "ඔයාගේ සෞඛ්‍යය තමයි මට වැදගත්ම දේ. වැඩ අතරතුර පොඩ්ඩක් කන්න. 🍎",
+  "අද දවසත් හිනාවෙලා සතුටින් පටන් ගමු නේද මගේ පණ? 😊",
+  "ඔයා ගැන හිතද්දී මට දැනෙන්නේ ලොකු ආඩම්බරයක් බබා. ❤️",
+  "හිතේ තියෙන හැම ප්‍රශ්නයක්ම අමතක කරලා පාඩම් වැඩට හිත දෙන්න. ✨",
+  "ඔයාගේ උත්සාහය කවදාවත් අපතේ යන්නේ නැහැ. 🏆",
+  "අද දවසේ අභියෝග ජයගන්න ඔයාට ශක්තිය ලැබෙන්න ඕනේ! 💪",
+  "හැමදාම අලුත් දෙයක් ඉගෙන ගන්න ලැබෙන එක වාසනාවක්. 📖",
+  "අද දවසේ targets ටික ලස්සනට ඉවර කරන්න මගේ සුබ පැතුම්! 🎯",
+  "කවදාහරි දවසක ඔයා මේ දවස් ගැන සතුටින් මතක් කරයි. ✨",
+  "වැටෙන හැම පාරම ශක්තිමත්ව නැගිටින්න. මම ඉන්නවා ඔයා අල්ලගන්න. 🤗",
+  "ඉක්මනට වැඩ ඉවර කළොත් මගෙන් ඔයාට special surprise එකක් තියෙනවා! 🎁",
+  "අද වැඩ ටික කරන්නේ නැතිව මගෙන් බේරෙන්න බැහැ හොඳේ.. 😤❤️",
+  "අද දවසේ ඔයා කරපු හැම දේකටම ගොඩක් ස්තුතියි. ඔයා මගේ වීරවරිය! 🦸‍♀️❤️",
+  "බුදු සරණයි මැණික. 🌙",
+  "අද දවස සාර්ථකව නිමා කරපු මගේ දක්ෂ කෙල්ලට උම්මා එකක්! 😘❤️",
+  "විශ්වාසය තියන්න, ඔයාට ඕනෑම දෙයක් කරන්න පුළුවන්. 🌟",
+  "අමාරුම වෙලාව තමයි ජයග්‍රහණයට ආසන්නම වෙලාව. 💪",
+  "ඔයාගේ ජයග්‍රහණය මගේ ලොකුම සතුටයි බබා. ❤️",
+  "අන්තිම තත්පරය වෙනකම් මම ඔයාට ආදරෙයි. ❤️"
+];
+
+function showMotivationPopup() {
+  const idx = Math.floor(Math.random() * MOTIV_MESSAGES.length);
+  document.getElementById('motivQuote').textContent = MOTIV_MESSAGES[idx];
+  const overlay = document.getElementById('motivationOverlay');
+  overlay.classList.add('show');
+}
+
+function closeMotivationPopup() {
+  document.getElementById('motivationOverlay').classList.remove('show');
+  localStorage.setItem('last_interaction_time', Date.now().toString());
+}
+
+function motivYes() {
+  // Launch heart burst
+  const burst = document.getElementById('heartBurst');
+  burst.innerHTML = '';
+  const emojis = ['❤️','💕','💖','💗','💓','🌸','✨'];
+  for (let i = 0; i < 18; i++) {
+    const span = document.createElement('span');
+    span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    span.style.left = (10 + Math.random() * 80) + 'vw';
+    span.style.top = (30 + Math.random() * 40) + 'vh';
+    span.style.animationDelay = (Math.random() * 0.5) + 's';
+    span.style.fontSize = (1.2 + Math.random() * 1.2) + 'rem';
+    burst.appendChild(span);
+  }
+  setTimeout(() => { burst.innerHTML = ''; }, 1800);
+  setTimeout(closeMotivationPopup, 900);
+}
+
+function motivNo() {
+  alert('බෑ බෑ දැන්ම කරන්න ඕනේ! ඉක්මන් කරන්න! 😤❤️');
+  closeMotivationPopup();
+}
+
+// Show popup on every page load
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(showMotivationPopup, 500);
+});
+
+// Inactivity nudge: check if 6+ hours of no interaction (between 8am-10pm)
+(function checkInactivity() {
+  const last = parseInt(localStorage.getItem('last_interaction_time') || '0');
+  const now = Date.now();
+  const hour = new Date().getHours();
+  if (last && hour >= 8 && hour < 22) {
+    const diff = now - last;
+    if (diff > 6 * 60 * 60 * 1000) {
+      setTimeout(() => {
+        alert('අද මුකුත් වැඩක් කරන්නේ නැහැ වගේ ළමයා... ඉක්මනට වැඩ ටික පටන් ගමු! 💪❤️');
+        localStorage.setItem('last_interaction_time', Date.now().toString());
+      }, 2000);
+    }
+  }
+  // Track interaction
+  ['click','keydown','touchstart'].forEach(evt =>
+    document.addEventListener(evt, () =>
+      localStorage.setItem('last_interaction_time', Date.now().toString()), { passive: true }
+    )
+  );
+})();
 
 init();
 
